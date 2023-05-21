@@ -1,6 +1,7 @@
 import { create } from "venom-bot";
 import * as dotenv from "dotenv";
 import { Configuration, OpenAIApi } from "openai";
+import axios from "axios";
 
 dotenv.config();
 
@@ -8,6 +9,26 @@ const configuration = new Configuration({
   organization: process.env.ORGANIZATION_ID,
   apiKey: process.env.OPENAI_KEY,
 });
+
+// dotenv.config();
+
+// const API_KEY = process.env.OPENAI_API_KEY;
+// const ORGANIZATION_ID = "org-lK6FoYjUJgJLIa27lPY9rg6s";
+
+const headers = {
+  Authorization: `Bearer ${configuration.apiKey}`,
+  "OpenAI-Organization": configuration.organization,
+};
+
+// Exemplo de solicitação usando o axios
+axios
+  .get("https://api.openai.com/v1/models", { headers })
+  .then((response) => {
+    console.log(response.data);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
 
 create({
   session: "Whats-Jarvis",
@@ -22,11 +43,106 @@ create({
   });
 
 // const commands = (client, message) => {};
+const openai = new OpenAIApi(configuration);
+
+// const getDavinciResponse = async (clientText) => {
+//   const options = {
+//     model: "text-davinci-35", // Modelo GPT a ser usado
+//     prompt: clientText, // Texto enviado pelo usuário
+//     temperature: 1, // Nível de variação das respostas geradas, 1 é o máximo
+//     max_tokens: 4000, // Quantidade de tokens (palavras) a serem retornadas pelo bot, 4000 é o máximo
+//   };
+
+//   try {
+//     const response = await openai.createCompletion(options);
+//     let botResponse = "";
+//     response.data.choices.forEach(({ text }) => {
+//       botResponse += text;
+//     });
+//     return `Chat GPT 🤖\n\n ${botResponse.trim()}`;
+//   } catch (error) {
+//     console.log("error", error);
+//     // return `❌ OpenAI Response Error: ${e.response.data.error.message}`;
+//     return `❌ OpenAI Response Error: `;
+//   }
+// };
+
+// const getDavinciResponse = async (clientText) => {
+//   const model = "gpt-3.5-turbo"; // Modelo GPT a ser usado
+//   const prompt = clientText; // Texto enviado pelo usuário
+//   const temperature = 1; // Nível de variação das respostas geradas, 1 é o máximo
+//   const maxTokens = 4000; // Quantidade de tokens (palavras) a serem retornadas pelo bot, 4000 é o máximo
+
+//   const params = {
+//     model,
+//     prompt,
+//     temperature,
+//     max_tokens: maxTokens,
+//   };
+
+//   try {
+//     const response = await openai.complete(params);
+//     let botResponse = response.choices[0].text.trim();
+//     return `Chat GPT 🤖\n\n${botResponse}`;
+//   } catch (error) {
+//     console.log("error", error);
+//     return `❌ OpenAI Response Error:`;
+//   }
+// };
+
+// const getDavinciResponse = async (clientText) => {
+//   const model = "gpt-3.5-turbo"; // Modelo GPT a ser usado
+//   const prompt = clientText; // Texto enviado pelo usuário
+//   const temperature = 1; // Nível de variação das respostas geradas, 1 é o máximo
+//   const maxTokens = 4000; // Quantidade de tokens (palavras) a serem retornadas pelo bot, 4000 é o máximo
+
+//   const params = {
+//     model,
+//     prompt,
+//     temperature,
+//     max_tokens: maxTokens,
+//   };
+
+//   try {
+//     const response = await openai.createCompletion(params);
+//     let botResponse = response.choices[0].text.trim();
+//     return `Chat GPT 🤖\n\n${botResponse}`;
+//   } catch (error) {
+//     console.log("error", error);
+//     return `❌ OpenAI Response Error:`;
+//   }
+// };
+
+const getDavinciResponse = async (clientText) => {
+  const options = {
+    model: "text-davinci-003", // Modelo GPT a ser usado
+    prompt: clientText, // Texto enviado pelo usuário
+    temperature: 1, // Nível de variação das respostas geradas, 1 é o máximo
+    max_tokens: 4000, // Quantidade de tokens (palavras) a serem retornadas pelo bot, 4000 é o máximo
+  };
+
+  try {
+    const response = await openai.createCompletion(options);
+    let botResponse = "";
+    response.data.choices.forEach(({ text }) => {
+      botResponse += text;
+    });
+    return `Chat GPT 🤖\n\n ${botResponse.trim()}`;
+  } catch (error) {
+    console.log("error", error);
+    // return `❌ OpenAI Response Error: ${e.response.data.error.message}`;
+    return `❌ OpenAI Response Error: `;
+  }
+};
 
 async function commands(client, message) {
   const iaCommands = {
     davinci3: "/bot",
     dalle: "/img",
+    poke: "/poke",
+    link: "/link",
+    sticker: "/fig",
+    triviaBot: "/trivia",
   };
 
   let msg = message.body;
@@ -39,6 +155,55 @@ async function commands(client, message) {
     const question = msg.substring(msg.indexOf(" "));
     console.log("firstWord", firstWord);
     console.log("question", question);
+
+    switch (firstWord) {
+      case iaCommands.davinci3:
+        console.log("iaCommands.davinci3", iaCommands.davinci3);
+        console.log("firstWord", firstWord);
+        const question = msg.substring(msg.indexOf(" "));
+        getDavinciResponse(question).then((response) => {
+          // console.log("response", response.data);
+          /*
+           * Faremos uma validação no message.from
+           * para caso a gente envie um comando
+           * a response não seja enviada para
+           * nosso próprio número e sim para
+           * a pessoa ou grupo para o qual eu enviei
+           */
+          // client.sendText(
+          //   message.from === process.env.BOT_NUMBER ? message.to : message.from,
+          //   response
+          // );
+          client.sendText(
+            message.from === process.env.PHONE_NUMBER
+              ? message.to
+              : message.chatId,
+            response
+          );
+        });
+        break;
+      case iaCommands.dalle:
+        console.log("iaCommands.dalle", iaCommands.dalle);
+        console.log("firstWord", firstWord);
+
+        const imgDescription = message.text.substring(
+          message.text.indexOf(" ")
+        );
+        getDalleResponse(imgDescription, message).then((imgUrl) => {
+          client.sendImage(
+            message.from === process.env.BOT_NUMBER ? message.to : message.from,
+            imgUrl,
+            imgDescription,
+            "Imagem gerada pela IA DALL-E 🤖"
+          );
+        });
+
+        break;
+      case iaCommands.poke:
+        console.log("iaCommands.poke", iaCommands.poke);
+        console.log("firstWord", firstWord);
+        break;
+    }
   }
 
   // let firstWord = msg.substring(0, msg.indexOf(" "));
