@@ -3,6 +3,8 @@ import * as dotenv from "dotenv";
 import { Configuration, OpenAIApi } from "openai";
 import axios from "axios";
 
+const venom = require("venom-bot");
+
 dotenv.config();
 
 const configuration = new Configuration({
@@ -15,30 +17,28 @@ const configuration = new Configuration({
 // const API_KEY = process.env.OPENAI_API_KEY;
 // const ORGANIZATION_ID = "org-lK6FoYjUJgJLIa27lPY9rg6s";
 
-const headers = {
-  Authorization: `Bearer ${configuration.apiKey}`,
-  "OpenAI-Organization": configuration.organization,
-};
+// const headers = {
+//   Authorization: `Bearer ${configuration.apiKey}`,
+//   "OpenAI-Organization": configuration.organization,
+// };
 
 // Exemplo de solicitação usando o axios
-axios
-  .get("https://api.openai.com/v1/models", { headers })
-  .then((response) => {
-    console.log(response.data);
-  })
-  .catch((error) => {
-    console.error(error);
-  });
+// axios
+//   .get("https://api.openai.com/v1/models", { headers })
+//   .then((response) => {
+//     console.log(response.data);
+//   })
+//   .catch((error) => {
+//     console.error(error);
+//   });
 
-create({
-  session: "Whats-Jarvis",
-  multidevice: true,
-})
-  .then((client) => {
+venom
+  .create()
+  .then((client: any) => {
     start(client);
     console.log("Whats-Jarvis connected\n");
   })
-  .catch((erro) => {
+  .catch((erro: any) => {
     console.log("erro\n", erro);
   });
 
@@ -113,7 +113,7 @@ const openai = new OpenAIApi(configuration);
 //   }
 // };
 
-const getDavinciResponse = async (clientText) => {
+const getDavinciResponse = async (clientText: any) => {
   const options = {
     model: "text-davinci-003", // Modelo GPT a ser usado
     prompt: clientText, // Texto enviado pelo usuário
@@ -135,7 +135,23 @@ const getDavinciResponse = async (clientText) => {
   }
 };
 
-async function commands(client, message) {
+// const DavinciResponse = async (clientText: any) => {};
+
+const getDalleResponse = async (imgDescription: any, clientText: any) => {
+  const options = {
+    prompt: clientText, // Descrição da imagem
+    n: 1, // Número de imagens a serem geradas
+    size: "1024x1024", // Tamanho da imagem
+  };
+
+  try {
+    // const response = await openai.createImage(options);
+    // return response.data.data[0].url;
+  } catch (e) {
+    // return `❌ OpenAI Response Error: ${e.response.data.error.message}`;
+  }
+};
+async function commands(client: any, message: any) {
   const iaCommands = {
     davinci3: "/bot",
     dalle: "/img",
@@ -151,6 +167,7 @@ async function commands(client, message) {
   console.log("typeMsg", typeMsg);
 
   if (typeMsg == "chat") {
+    console.log("typeMsg: chat");
     let firstWord = msg.substring(0, msg.indexOf(" "));
     const question = msg.substring(msg.indexOf(" "));
     console.log("firstWord", firstWord);
@@ -170,7 +187,7 @@ async function commands(client, message) {
            * nosso próprio número e sim para
            * a pessoa ou grupo para o qual eu enviei
            */
-          // client.sendText(
+          // client:any.sendText(
           //   message.from === process.env.BOT_NUMBER ? message.to : message.from,
           //   response
           // );
@@ -206,6 +223,10 @@ async function commands(client, message) {
     }
   }
 
+  if (typeMsg == "image") {
+    console.log("typeMsg: image");
+  }
+
   // let firstWord = msg.substring(0, msg.indexOf(" "));
   // const question = msg.substring(msg.indexOf(" "));
   // console.log("firstWord", firstWord);
@@ -224,10 +245,10 @@ async function commands(client, message) {
 //   console.log("question", question);
 // };
 
-async function start(client) {
+async function start(client: any) {
   console.log("Start Client\n");
   // client.onAnyMessage((message) => commands(client, message));
-  client.onAnyMessage((message) => {
+  client.onAnyMessage((message: any) => {
     console.log("Start Client\n");
     commands(client, message);
   });
