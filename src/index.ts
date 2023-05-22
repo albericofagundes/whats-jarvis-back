@@ -1,27 +1,30 @@
-import { create } from "venom-bot";
-import dotenv from "dotenv";
-const { Configuration, OpenAIApi } = require("openai");
+// Importações
+import { create } from "venom-bot"; // Importa a função create da biblioteca "venom-bot" para criar um cliente de WhatsApp
+import dotenv from "dotenv"; // Importa a biblioteca "dotenv" para carregar variáveis de ambiente do arquivo .env
+const { Configuration, OpenAIApi } = require("openai"); // Importa objetos Configuration e OpenAIApi para interagir com as APIs do OpenAI
 
+// Criação do cliente do WhatsApp
 const createOption = {
-  session: "my-session",
+  session: "my-session", // Define a opção session como "my-session"
 };
 
 create(createOption)
   .then((client: any) => {
-    start(client);
+    start(client); // Inicia o cliente de WhatsApp
     console.log("Whats-Jarvis connected\n");
   })
   .catch((erro: any) => {
     console.log("erro\n", erro);
   });
 
-dotenv.config();
+dotenv.config(); // Carrega variáveis de ambiente do arquivo .env
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_KEY,
 });
 
-const openai = new OpenAIApi(configuration);
+const openai = new OpenAIApi(configuration); // Cria uma instância da API do OpenAI
 
+// Função para obter a resposta do modelo GPT-3.5-turbo
 const getDavinciResponse = async (prompt: string) => {
   console.log("getDavinciResponse");
   console.log("prompt", prompt);
@@ -31,37 +34,39 @@ const getDavinciResponse = async (prompt: string) => {
   };
 
   try {
-    const response = await openai.createChatCompletion(options);
+    const response = await openai.createChatCompletion(options); // Gera uma resposta baseada no prompt fornecido usando o modelo GPT-3.5-turbo
 
     console.log(response["data"]["choices"][0]["message"]["content"]);
 
-    return response["data"]["choices"][0]["message"]["content"];
+    return response["data"]["choices"][0]["message"]["content"]; // Retorna a resposta obtida como uma string
   } catch (error) {
     console.log("error", error);
   }
 };
 
+// Função para obter uma imagem gerada pela IA DALL-E
 const getDalleResponse = async (clientText: string) => {
   console.log("getDalleResponse");
   console.log("clientText", clientText);
   const options = {
-    prompt: clientText, // Descrição da imagem
-    n: 1, // Número de imagens a serem geradas
-    size: "1024x1024", // Tamanho da imagem
+    prompt: clientText, // Define a descrição da imagem
+    n: 1, // Define o número de imagens a serem geradas
+    size: "1024x1024", // Define o tamanho da imagem desejada
   };
 
   try {
-    const response = await openai.createImage(options);
-    return response.data.data[0].url;
+    const response = await openai.createImage(options); // Gera uma imagem baseada na descrição fornecida usando o modelo DALL-E
+    return response.data.data[0].url; // Retorna a URL da imagem gerada
   } catch (error) {
     return `❌ OpenAI Response Error: ${error}`;
   }
 };
 
+// Função que lida com os comandos enviados pelo usuário no WhatsApp
 async function commands(client: any, message: any) {
   const iaCommands = {
-    davinci3: "/bot",
-    dalle: "/img",
+    davinci3: "/bot", // Comando para interagir com o modelo GPT-3.5-turbo
+    dalle: "/img", // Comando para interagir com o modelo DALL-E
     poke: "/poke",
     link: "/link",
     sticker: "/fig",
@@ -108,9 +113,11 @@ async function commands(client: any, message: any) {
 
   if (message.type == "image") {
     console.log("message.type === imagem");
+    // Lógica para processar a imagem recebida, se necessário
   }
 }
 
+// Função que inicia o cliente do WhatsApp e trata as mensagens recebidas
 async function start(client: any) {
   console.log("Start Client\n");
   client.onAnyMessage((message: any) => {
