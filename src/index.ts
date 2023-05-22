@@ -41,7 +41,22 @@ const getDavinciResponse = async (prompt: string) => {
   }
 };
 
-// }
+const getDalleResponse = async (clientText: string) => {
+  console.log("getDalleResponse");
+  console.log("clientText", clientText);
+  const options = {
+    prompt: clientText, // Descrição da imagem
+    n: 1, // Número de imagens a serem geradas
+    size: "1024x1024", // Tamanho da imagem
+  };
+
+  try {
+    const response = await openai.createImage(options);
+    return response.data.data[0].url;
+  } catch (error) {
+    return `❌ OpenAI Response Error: ${error}`;
+  }
+};
 
 async function commands(client: any, message: any) {
   const iaCommands = {
@@ -68,6 +83,23 @@ async function commands(client: any, message: any) {
               ? message.to
               : message.chatId,
             ` Chat GPT 🤖\n\n ${response}`
+          );
+        });
+        break;
+
+      case iaCommands.dalle:
+        const imgDescription = message.body.substring(
+          message.body.indexOf(" ")
+        );
+
+        getDalleResponse(imgDescription).then((imgUrl) => {
+          client.sendImage(
+            message.from === process.env.BOT_NUMBER
+              ? message.to
+              : message.chatId,
+            imgUrl,
+            imgDescription,
+            "Imagem gerada pela IA DALL-E 🤖"
           );
         });
         break;
