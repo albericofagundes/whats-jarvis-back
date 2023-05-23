@@ -64,6 +64,16 @@ const getDalleResponse = async (clientText: string) => {
 
 // Função que lida com os comandos enviados pelo usuário no WhatsApp
 async function commands(client: any, message: any) {
+  const command = message.body.split(" ")[0];
+  const command1 = message.body.split(" ")[1];
+  const command2 = message.body.split(" ")[2];
+  let firstWord = message.body.substring(0, message.body.indexOf(" "));
+
+  console.log("command", command);
+  console.log("command1", command1);
+  console.log("command2", command2);
+  console.log("firstWord", firstWord);
+
   const iaCommands = {
     davinci3: "/bot", // Comando para interagir com o modelo GPT-3.5-turbo
     dalle: "/img", // Comando para interagir com o modelo DALL-E
@@ -77,7 +87,7 @@ async function commands(client: any, message: any) {
     console.log("message.type", message.type);
     console.log("message.body", message.body);
 
-    let firstWord = message.body.substring(0, message.body.indexOf(" "));
+    // let firstWord = message.body.substring(0, message.body.indexOf(" "));
 
     switch (firstWord) {
       case iaCommands.davinci3:
@@ -108,12 +118,36 @@ async function commands(client: any, message: any) {
           );
         });
         break;
+
+      case iaCommands.triviaBot:
+
+      case iaCommands.sticker:
+        let firstWord = message.body.substring(0, message.body.indexOf(" "));
+        const imgToSticker = message.body.substring(message.body.indexOf(" "));
+
+      // console.log("firstWord", firstWord);
+      // console.log("imgToSticker", imgToSticker);
     }
   }
 
   if (message.type == "image") {
     console.log("message.type === imagem");
     // Lógica para processar a imagem recebida, se necessário
+
+    let firstWord = message.body.substring(0, message.body.indexOf(" "));
+    const imgToSticker = message.body.substring(message.body.indexOf(" "));
+
+    console.log("firstWord", firstWord);
+    console.log("imgToSticker", imgToSticker);
+
+    switch (firstWord) {
+      case iaCommands.sticker:
+        let firstWord = message.body.substring(0, message.body.indexOf(" "));
+        const imgToSticker = message.body.substring(message.body.indexOf(" "));
+
+        console.log("firstWord", firstWord);
+        console.log("imgToSticker", imgToSticker);
+    }
   }
 }
 

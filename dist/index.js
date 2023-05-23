@@ -70,6 +70,14 @@ const getDalleResponse = (clientText) => __awaiter(void 0, void 0, void 0, funct
 // Função que lida com os comandos enviados pelo usuário no WhatsApp
 function commands(client, message) {
     return __awaiter(this, void 0, void 0, function* () {
+        const command = message.body.split(" ")[0];
+        const command1 = message.body.split(" ")[1];
+        const command2 = message.body.split(" ")[2];
+        let firstWord = message.body.substring(0, message.body.indexOf(" "));
+        console.log("command", command);
+        console.log("command1", command1);
+        console.log("command2", command2);
+        console.log("firstWord", firstWord);
         const iaCommands = {
             davinci3: "/bot",
             dalle: "/img",
@@ -81,7 +89,7 @@ function commands(client, message) {
         if (message.type == "chat") {
             console.log("message.type", message.type);
             console.log("message.body", message.body);
-            let firstWord = message.body.substring(0, message.body.indexOf(" "));
+            // let firstWord = message.body.substring(0, message.body.indexOf(" "));
             switch (firstWord) {
                 case iaCommands.davinci3:
                     const question = message.body.substring(message.body.indexOf(" "));
@@ -99,11 +107,28 @@ function commands(client, message) {
                             : message.chatId, imgUrl, imgDescription, "Imagem gerada pela IA DALL-E 🤖");
                     });
                     break;
+                case iaCommands.triviaBot:
+                case iaCommands.sticker:
+                    let firstWord = message.body.substring(0, message.body.indexOf(" "));
+                    const imgToSticker = message.body.substring(message.body.indexOf(" "));
+                // console.log("firstWord", firstWord);
+                // console.log("imgToSticker", imgToSticker);
             }
         }
         if (message.type == "image") {
             console.log("message.type === imagem");
             // Lógica para processar a imagem recebida, se necessário
+            let firstWord = message.body.substring(0, message.body.indexOf(" "));
+            const imgToSticker = message.body.substring(message.body.indexOf(" "));
+            console.log("firstWord", firstWord);
+            console.log("imgToSticker", imgToSticker);
+            switch (firstWord) {
+                case iaCommands.sticker:
+                    let firstWord = message.body.substring(0, message.body.indexOf(" "));
+                    const imgToSticker = message.body.substring(message.body.indexOf(" "));
+                    console.log("firstWord", firstWord);
+                    console.log("imgToSticker", imgToSticker);
+            }
         }
     });
 }
